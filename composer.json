@@ -1,4 +1,5 @@
 {
+  "name": "eugeniypetrov/helpers",
   "files": [
     "pdo.php"
   ]
