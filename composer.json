@@ -1,6 +1,8 @@
 {
   "name": "eugeniypetrov/helpers",
-  "files": [
-    "pdo.php"
-  ]
+  "autoload": {
+    "files": [
+      "pdo.php"
+    ]
+  }
 }
