@@ -55,6 +55,14 @@ function extract_keys($array, $keys)
     return array_intersect_key($array, array_flip($keys));
 }
 
+function extract_from_to($array)
+{
+    return array_intersect_key($array, [
+        "from" => true,
+        "to" => true,
+    ]);
+}
+
 function extract_slice($list, $key)
 {
     $slice = [];
