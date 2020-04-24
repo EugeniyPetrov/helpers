@@ -213,3 +213,84 @@ function measure($name = null, callable $callback = null)
 
     return $result;
 }
+
+function insert_into(string $table, array $values, \LazyPdoConnection $db, array $options = [])
+{
+    $ignore = $options["ignore"] ?? false;
+    $print = $options["print"] ?? false;
+
+    if (count($values) === 0) {
+        return;
+    }
+
+    $fields = [];
+    foreach ($values[0] as $key => $value) {
+        $fields[] = $key;
+    }
+    $fieldsMap = array_flip($fields);
+
+    $batch = [];
+    foreach ($values as $i => $value) {
+        $row = [];
+
+        $unknownColumns = array_diff_key($value, $fieldsMap);
+        $missingColumns = array_diff_key($fieldsMap, $value);
+        if (count($unknownColumns) > 0) {
+            throw new \RuntimeException(
+                sprintf(
+                    "Invalid value of element %d. Unknown columns: %s",
+                    $i,
+                    json_encode(array_keys($unknownColumns))
+                )
+            );
+        }
+        if (count($missingColumns) > 0) {
+            throw new \RuntimeException(
+                sprintf(
+                    "Invalid value of element %d. Missing columns: %s",
+                    $i,
+                    json_encode(array_keys($missingColumns))
+                )
+            );
+        }
+
+        foreach ($fields as $field) {
+            $val = $value[$field] ?? null;
+            if ($val === null) {
+                $row[] = "NULL";
+            } elseif (is_int($val) || is_bool($val)) {
+                $row[] = intval($val);
+            } elseif (is_float($val) || is_double($val)) {
+                $row[] = floatval($val);
+            } elseif ($val instanceof DateTimeInterface) {
+                $row[] = $db->quote($val->format('Y-m-d H:i:s'));
+            } else {
+                $row[] = $db->quote($val);
+            }
+        }
+
+        $batch[] = "(" . join(", ", $row) . ")";
+    }
+
+    $ignoreStr = $ignore ? " IGNORE " : " ";
+    $fieldsQuoted = '`' . join('`, `', $fields) . '`';
+    $sql = "INSERT{$ignoreStr}INTO `$table` ({$fieldsQuoted}) VALUES\n" . join(",\n", $batch) . ";\n";
+
+    if ($print) {
+        echo $sql;
+    } else {
+        $db->query($sql);
+    }
+}
+
+function in_values($array, $db)
+{
+    return join(", ", quote_array($array, $db));
+}
+
+function quote_array($array, \LazyPdoConnection $db)
+{
+    return array_map(function ($item) use ($db) {
+        return $db->quote($item);
+    }, $array);
+}
