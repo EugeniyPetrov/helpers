@@ -7,22 +7,22 @@ class MultipleTrustedProxiesLoader implements TrustedProxiesLoader
     /**
      * @var array|TrustedProxiesLoader[]
      */
-    private $proxyLoader;
+    private $proxyLoaders;
 
     /**
      * MultipleTrustedProxiesLoader constructor.
-     * @param TrustedProxiesLoader[] $proxyLoader
+     * @param TrustedProxiesLoader[] $proxyLoaders
      */
-    public function __construct(array $proxyLoader)
+    public function __construct(array $proxyLoaders)
     {
-        $this->proxyLoader = $proxyLoader;
+        $this->proxyLoaders = $proxyLoaders;
     }
 
     public function load(): array
     {
         $proxies = [];
 
-        foreach ($this->proxyLoader as $loader) {
+        foreach ($this->proxyLoaders as $loader) {
             $proxies = array_merge($proxies, $loader->load());
         }
 
