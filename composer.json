@@ -1,6 +1,9 @@
 {
   "name": "eugeniypetrov/helpers",
   "autoload": {
+    "files": [
+      "pdo.php"
+    ],
     "psr-4": {
       "Eugeniypetrov\\Lib\\": "src/"
     }

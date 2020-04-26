@@ -218,6 +218,7 @@ function insert_into(string $table, array $values, \LazyPdoConnection $db, array
 {
     $ignore = $options["ignore"] ?? false;
     $print = $options["print"] ?? false;
+    $update = $options["update"] ?? false;
 
     if (count($values) === 0) {
         return;
@@ -274,7 +275,14 @@ function insert_into(string $table, array $values, \LazyPdoConnection $db, array
 
     $ignoreStr = $ignore ? " IGNORE " : " ";
     $fieldsQuoted = '`' . join('`, `', $fields) . '`';
-    $sql = "INSERT{$ignoreStr}INTO `$table` ({$fieldsQuoted}) VALUES\n" . join(",\n", $batch) . ";\n";
+    $onDuplicate = "";
+    if ($update) {
+        $onDuplicate = "\nON DUPLICATE KEY UPDATE\n" . join(",\n", array_map(function ($field) {
+                return sprintf('`%s` = VALUES(`%s`)', $field, $field);
+            }, $fields));
+    }
+
+    $sql = "INSERT{$ignoreStr}INTO `$table` ({$fieldsQuoted}) VALUES\n" . join(",\n", $batch) . "$onDuplicate;\n";
 
     if ($print) {
         echo $sql;
