@@ -9,6 +9,8 @@
     }
   },
   "require": {
-    "ext-json": "*"
+    "doctrine/migrations": "^2.2",
+    "ext-json": "*",
+    "ext-curl": "*"
   }
 }
