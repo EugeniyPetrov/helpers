@@ -8,14 +8,20 @@ class Api
      * @var string
      */
     private $endpoint;
+    /**
+     * @var array
+     */
+    private $headers;
 
     /**
      * RegApi constructor.
      * @param string $endpoint
+     * @param array $headers
      */
-    public function __construct(string $endpoint)
+    public function __construct(string $endpoint, array $headers = [])
     {
         $this->endpoint = $endpoint;
+        $this->headers = $headers;
     }
 
     /**
@@ -47,10 +53,10 @@ class Api
         curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
 
         $signature = hash_hmac('sha256', $request, $secret);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array_merge($this->headers, [
             "Content-Type: application/x-www-form-urlencoded",
             "X-Signature: $signature",
-        ]);
+        ]));
         $response = curl_exec($ch);
 
         if (curl_errno($ch) !== CURLE_OK) {
