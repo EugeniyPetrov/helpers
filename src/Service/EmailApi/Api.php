@@ -57,9 +57,13 @@ class Api
             throw new \RuntimeException(sprintf("Request failed. %s", curl_error($ch)));
         }
 
+        if ($response === "") {
+            throw new \RuntimeException("Empty response.");
+        }
+
         $decoded = json_decode($response, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \RuntimeException("Unable to decode response");
+            throw new \RuntimeException(sprintf("Unable to decode response. %s", json_last_error_msg()));
         }
 
         return new Response(
