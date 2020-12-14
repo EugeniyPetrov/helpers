@@ -13,5 +13,6 @@
     "ext-json": "*",
     "ext-curl": "*",
     "symfony/monolog-bundle": "^3.6"
-  }
+  },
+  "minimum-stability": "dev"
 }
