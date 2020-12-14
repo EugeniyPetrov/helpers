@@ -1,5 +1,12 @@
 {
   "name": "eugeniypetrov/helpers",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Evgeniy Petrov",
+      "email": "eug.a.petrov@gmail.com"
+    }
+  ],
   "autoload": {
     "files": [
       "pdo.php"
