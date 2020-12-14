@@ -54,25 +54,31 @@ class IpApi
             throw new \RuntimeException(sprintf("Unable to obtain location. Error: %s", curl_error($ch)));
         }
 
-        $geo = json_decode($response);
+        $geo = json_decode($response, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \RuntimeException(sprintf("Invalid response from geo service"));
+        }
+
+        if (key_exists("status", $geo) && $geo["status"] === "fail") {
+            throw new \RuntimeException(
+                sprintf("Unable to obtain location. Error: %s", $geo["message"])
+            );
         }
 
         curl_close($ch);
 
         return (new Geo())
-            ->setCountry((string)$geo->country)
-            ->setCountryCode((string)$geo->countryCode)
-            ->setRegion((string)$geo->region)
-            ->setRegionName((string)$geo->regionName)
-            ->setCity((string)$geo->city)
-            ->setZip((string)$geo->zip)
-            ->setLat((float)$geo->lat)
-            ->setLon((float)$geo->lon)
-            ->setTimezone(new \DateTimeZone($geo->timezone))
-            ->setIsp((string)$geo->isp)
-            ->setOrg((string)$geo->org)
-            ->setAs((string)$geo->as);
+            ->setCountry((string)$geo["country"])
+            ->setCountryCode((string)$geo["countryCode"])
+            ->setRegion((string)$geo["region"])
+            ->setRegionName((string)$geo["regionName"])
+            ->setCity((string)$geo["city"])
+            ->setZip((string)$geo["zip"])
+            ->setLat((float)$geo["lat"])
+            ->setLon((float)$geo["lon"])
+            ->setTimezone(new \DateTimeZone($geo["timezone"]))
+            ->setIsp((string)$geo["isp"])
+            ->setOrg((string)$geo["org"])
+            ->setAs((string)$geo["as"]);
     }
 }
